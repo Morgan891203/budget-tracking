@@ -39,16 +39,22 @@ const categoryIcons: Record<string, LucideIcon> = {
 };
 
 type ExpensePageProps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: { month?: string; year?: string };
+  searchParams: { month?: string | string[]; year?: string | string[] };
 };
 
 async function ExpensePage({ searchParams }: ExpensePageProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
-  const selectedYear = searchParams.year ?? currentYear.toString();
+  const yearParam = searchParams.year;
+  const selectedYear =
+    (Array.isArray(yearParam) ? yearParam[0] : yearParam) ??
+    currentYear.toString();
+  const monthParam = searchParams.month;
   const selectedMonth =
-    searchParams.month ?? (new Date().getMonth() + 1).toString().padStart(2, '0');
+    (Array.isArray(monthParam) ? monthParam[0] : monthParam) ??
+    (new Date().getMonth() + 1).toString().padStart(2, '0');
 
   const year = parseInt(selectedYear, 10);
   const month = parseInt(selectedMonth, 10);

@@ -4,8 +4,9 @@ import { SalaryForm } from '@/components/features/salary/salary-form';
 import PayslipList from '@/components/features/salary/payslip-list';
 
 type SalaryPageProps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { year?: string | string[]; month?: string | string[] };
 };
 
 async function SalaryPage({ searchParams }: SalaryPageProps) {

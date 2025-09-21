@@ -4,8 +4,9 @@ import { TrendsChart } from '@/components/features/analysis/trends-chart';
 import { ExpenseCategoryChart } from '@/components/features/analysis/expense-category-chart';
 
 type AnalysisPageProps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { month?: string | string[]; year?: string | string[] };
 };
 
 async function AnalysisPage({ searchParams }: AnalysisPageProps) {
