@@ -6,7 +6,8 @@ import { ExpenseCategoryChart } from '@/components/features/analysis/expense-cat
 type AnalysisPageProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  searchParams?: any;
 };
 
 async function AnalysisPage(props: AnalysisPageProps) {
