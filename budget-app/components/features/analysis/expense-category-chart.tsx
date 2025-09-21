@@ -23,6 +23,9 @@ const COLORS = [
 
 const RADIAN = Math.PI / 180;
 
+// The recharts library has generic types for this callback, making it difficult to
+// provide a specific type without TypeScript errors. Disabling the rule for this line is a pragmatic solution.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
   // Don't render labels for small slices to avoid clutter
   if (percent < 0.05) {
@@ -61,7 +64,7 @@ export function ExpenseCategoryChart({ data }: { data: ChartData[] }) {
           </Pie>
           <Tooltip
             formatter={(value: number) =>
-              new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value as number)
+              new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
             }
           />
           <Legend />
