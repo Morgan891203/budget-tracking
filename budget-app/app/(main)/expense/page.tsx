@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db';
 import { ExpenseForm } from '@/components/features/expense/expense-form';
 import { deleteExpense, deleteMomDebtTransaction } from '@/lib/actions';
+import { formatCurrency } from '@/lib/utils';
 import { MomDebtForm } from '@/components/features/expense/mom-debt-form';
 import { EditExpense } from '@/components/features/expense/edit-expense';
 import { DeleteButton } from '@/components/features/expense/delete-button';
@@ -16,15 +17,6 @@ import {
   Receipt,
   type LucideIcon,
 } from 'lucide-react';
-
-// Helper function to format currency
-function formatCurrency(amount: number | Prisma.Decimal) {
-  const number = typeof amount === 'number' ? amount : amount.toNumber();
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(number);
-}
 
 const categoryIcons: Record<string, LucideIcon> = {
   Rent: Home,

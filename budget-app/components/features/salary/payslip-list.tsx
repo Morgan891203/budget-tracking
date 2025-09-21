@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { Salary, Expense } from '@prisma/client';
+import { formatCurrency } from '@/lib/utils';
 import { deleteSalaryEntry } from '@/lib/actions';
 import { DeleteButton } from '../expense/delete-button';
 
@@ -16,13 +17,6 @@ type Payslip = Omit<Salary, 'amount'> & {
   totalDeductions: number;
   net: number;
 };
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-}
 
 export default function PayslipList({ payslips }: { payslips: Payslip[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
