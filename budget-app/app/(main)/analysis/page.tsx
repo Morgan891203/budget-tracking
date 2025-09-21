@@ -8,7 +8,7 @@ type AnalysisPageProps = {
   searchParams: { month?: string; year?: string };
 };
 
-export default async function AnalysisPage({ params, searchParams }: AnalysisPageProps) {
+async function AnalysisPage({ params, searchParams }: AnalysisPageProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
@@ -225,3 +225,5 @@ export default async function AnalysisPage({ params, searchParams }: AnalysisPag
     </div>
   );
 }
+
+export default AnalysisPage;

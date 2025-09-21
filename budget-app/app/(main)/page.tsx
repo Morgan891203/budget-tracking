@@ -24,21 +24,20 @@ type DashboardPageProps = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export default async function DashboardPage({
-  params,
-  searchParams,
-}: DashboardPageProps) {
+async function DashboardPage({ params, searchParams }: DashboardPageProps) {
   const ITEMS_PER_PAGE = 5;
   const summaryPage = parseInt((searchParams.summaryPage as string) ?? '1', 10);
   const expensesPage = parseInt((searchParams.expensesPage as string) ?? '1', 10);
   const deductionsPage = parseInt((searchParams.deductionsPage as string) ?? '1', 10);
 
-  const salaries = await prisma.salary.findMany({ orderBy: { date: 'asc' } });
-  const allExpenses = await prisma.expense.findMany({ orderBy: { date: 'asc' } });
-  const momDebts = await prisma.debt.findMany({
-    where: { person: 'Mom' },
-    orderBy: { date: 'desc' },
-  });
+  const [salaries, allExpenses, momDebts] = await Promise.all([
+    prisma.salary.findMany({ orderBy: { date: 'asc' } }),
+    prisma.expense.findMany({ orderBy: { date: 'asc' } }),
+    prisma.debt.findMany({
+      where: { person: 'Mom' },
+      orderBy: { date: 'desc' },
+    }),
+  ]);
 
   const overallMomDebtBalance = momDebts.reduce((acc, debt) => {
     if (debt.type === 'theyOwe') {
@@ -302,3 +301,5 @@ export default async function DashboardPage({
     </div>
   );
 }
+
+export default DashboardPage;

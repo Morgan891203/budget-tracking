@@ -38,13 +38,15 @@ const categoryIcons: Record<string, LucideIcon> = {
   Default: Receipt,
 };
 
-export default async function ExpensePage({
-  params,
-  searchParams,
-}: {
+type ExpensePageProps = {
   params: Record<string, never>;
   searchParams: { month?: string; year?: string };
-}) {
+};
+
+async function ExpensePage({
+  params,
+  searchParams,
+}: ExpensePageProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
   const selectedYear = searchParams.year ?? currentYear.toString();
@@ -57,18 +59,35 @@ export default async function ExpensePage({
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 1);
 
-  const momDebtTransactions = await prisma.debt.findMany({
-    where: {
-      person: 'Mom',
-      date: {
-        gte: startDate,
-        lt: endDate,
+  const [momDebtTransactions, expensesByCategory, allExpenses] = await Promise.all([
+    prisma.debt.findMany({
+      where: {
+        person: 'Mom',
+        date: { gte: startDate, lt: endDate },
       },
-    },
-    orderBy: {
-      date: 'desc',
-    },
-  });
+      orderBy: { date: 'desc' },
+    }),
+    prisma.expense.groupBy({
+      by: ['category'],
+      where: {
+        date: { gte: startDate, lt: endDate },
+        NOT: {
+          category: { in: ['Taxes', 'Benefits', 'Retirement', 'Other', 'Gasoline'] },
+        },
+      },
+      _sum: { amount: true },
+      orderBy: { category: 'asc' },
+    }),
+    prisma.expense.findMany({
+      where: {
+        date: { gte: startDate, lt: endDate },
+        NOT: {
+          category: { in: ['Taxes', 'Benefits', 'Retirement', 'Other', 'Gasoline'] },
+        },
+      },
+      orderBy: [{ category: 'asc' }, { date: 'desc' }],
+    }),
+  ]);
 
   const { iOwe, theyOwe } = momDebtTransactions.reduce(
     (acc, t) => {
@@ -84,27 +103,6 @@ export default async function ExpensePage({
   );
 
   const momBalance = theyOwe - iOwe;
-
-  const expensesByCategory = await prisma.expense.groupBy({
-    by: ['category'],
-    where: {
-      date: {
-        gte: startDate,
-        lt: endDate,
-      },
-      NOT: {
-        category: {
-          in: ['Taxes', 'Benefits', 'Retirement', 'Other', 'Gasoline'],
-        },
-      },
-    },
-    _sum: {
-      amount: true,
-    },
-    orderBy: {
-      category: 'asc',
-    },
-  });
 
   const grandTotal = expensesByCategory.reduce(
     (total, category) => total + (category._sum.amount?.toNumber() ?? 0),
@@ -122,21 +120,6 @@ export default async function ExpensePage({
       a.category.localeCompare(b.category),
     );
   }
-
-  const allExpenses: Expense[] = await prisma.expense.findMany({
-    where: {
-      date: {
-        gte: startDate,
-        lt: endDate,
-      },
-      NOT: {
-        category: {
-          in: ['Taxes', 'Benefits', 'Retirement', 'Other', 'Gasoline'],
-        },
-      },
-    },
-    orderBy: [{ category: 'asc' }, { date: 'desc' }],
-  });
 
   const plainExpenses = allExpenses.map((expense) => ({
     ...expense,
@@ -382,3 +365,5 @@ export default async function ExpensePage({
     </div>
   );
 }
+
+export default ExpensePage;
