@@ -5,14 +5,20 @@ import PayslipList from '@/components/features/salary/payslip-list';
 
 type SalaryPageProps = {
   params: any;
-  searchParams: { year?: string; month?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 async function SalaryPage({ searchParams }: SalaryPageProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
-  const selectedYear = searchParams.year?.toString() ?? currentYear.toString();
-  const selectedMonth = searchParams.month?.toString() ?? (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const yearParam = searchParams.year;
+  const selectedYear =
+    (Array.isArray(yearParam) ? yearParam[0] : yearParam) ??
+    currentYear.toString();
+  const monthParam = searchParams.month;
+  const selectedMonth =
+    (Array.isArray(monthParam) ? monthParam[0] : monthParam) ??
+    (new Date().getMonth() + 1).toString().padStart(2, '0');
 
   const year = parseInt(selectedYear, 10);
   const month = parseInt(selectedMonth, 10);

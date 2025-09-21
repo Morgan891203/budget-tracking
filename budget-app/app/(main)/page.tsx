@@ -20,15 +20,30 @@ function formatCurrency(amount: number | { toNumber(): number }) {
 }
 
 type DashboardPageProps = {
-  params: Record<string, never>;
+  params: any;
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-async function DashboardPage({ params, searchParams }: DashboardPageProps) {
+async function DashboardPage({ searchParams }: DashboardPageProps) {
   const ITEMS_PER_PAGE = 5;
-  const summaryPage = parseInt((searchParams.summaryPage as string) ?? '1', 10);
-  const expensesPage = parseInt((searchParams.expensesPage as string) ?? '1', 10);
-  const deductionsPage = parseInt((searchParams.deductionsPage as string) ?? '1', 10);
+  const summaryPageParam = searchParams.summaryPage;
+  const summaryPage = parseInt(
+    (Array.isArray(summaryPageParam) ? summaryPageParam[0] : summaryPageParam) ??
+      '1',
+    10,
+  );
+  const expensesPageParam = searchParams.expensesPage;
+  const expensesPage = parseInt(
+    (Array.isArray(expensesPageParam) ? expensesPageParam[0] : expensesPageParam) ??
+      '1',
+    10,
+  );
+  const deductionsPageParam = searchParams.deductionsPage;
+  const deductionsPage = parseInt(
+    (Array.isArray(deductionsPageParam) ? deductionsPageParam[0] : deductionsPageParam) ??
+      '1',
+    10,
+  );
 
   const [salaries, allExpenses, momDebts] = await Promise.all([
     prisma.salary.findMany({ orderBy: { date: 'asc' } }),
