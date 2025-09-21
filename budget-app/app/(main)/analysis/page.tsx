@@ -82,36 +82,23 @@ export default async function AnalysisPage({
     monthlySummary[monthKey] = { gross: 0, deductions: 0, expenses: 0 };
   }
 
-  yearlySalaries.forEach((salary) => {
-    const monthKey = format(salary.date, 'yyyy-MM');
-    if (monthlySummary[monthKey]) {
-      monthlySummary[monthKey].gross += salary.amount.toNumber();
-    }
-  });
+  const allYearlyData = [
+    ...yearlySalaries.map((item) => ({ type: 'gross' as const, date: item.date, value: item.amount.toNumber() })),
+    ...yearlyDeductions.map((item) => ({ type: 'deductions' as const, date: item.date, value: item.amount.toNumber() })),
+    ...yearlyOtherExpenses.map((item) => ({ type: 'expenses' as const, date: item.date, value: item.amount.toNumber() })),
+    ...yearlyMomDebts.map((item) => ({
+      type: 'expenses' as const,
+      date: item.date,
+      value: item.type === 'iOwe' ? item.amount.toNumber() : -item.amount.toNumber(),
+    })),
+  ];
 
-  yearlyDeductions.forEach((expense) => {
-    const monthKey = format(expense.date, 'yyyy-MM');
+  for (const dataPoint of allYearlyData) {
+    const monthKey = format(dataPoint.date, 'yyyy-MM');
     if (monthlySummary[monthKey]) {
-      monthlySummary[monthKey].deductions += expense.amount.toNumber();
+      monthlySummary[monthKey][dataPoint.type] += dataPoint.value;
     }
-  });
-
-  yearlyOtherExpenses.forEach((expense) => {
-    const monthKey = format(expense.date, 'yyyy-MM');
-    if (monthlySummary[monthKey]) {
-      monthlySummary[monthKey].expenses += expense.amount.toNumber();
-    }
-  });
-
-  yearlyMomDebts.forEach((debt) => {
-    const monthKey = format(debt.date, 'yyyy-MM');
-    if (monthlySummary[monthKey]) {
-      const amount = debt.amount.toNumber();
-      // 'iOwe' is an expense, 'theyOwe' is a credit (negative expense)
-      monthlySummary[monthKey].expenses +=
-        debt.type === 'iOwe' ? amount : -amount;
-    }
-  });
+  }
 
   const trendsChartData = Object.entries(monthlySummary)
     .map(([monthKey, summary]) => {
