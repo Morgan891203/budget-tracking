@@ -5,13 +5,13 @@ import { ExpenseCategoryChart } from '@/components/features/analysis/expense-cat
 
 export default async function AnalysisPage({
   searchParams,
-}: { searchParams: { month?: string; year?: string } }) {
+}: {
+  params: {}; // This page doesn't have dynamic route parameters
+  searchParams: { month?: string; year?: string };
+}) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
-  // Accessing searchParams opts the page into dynamic rendering.
-  // The warning in development about awaiting searchParams is informational
-  // and can be disregarded as this is the correct way to access them in a Server Component.
   const selectedYear = searchParams.year ?? currentYear.toString();
   const selectedMonth =
     searchParams.month ?? (new Date().getMonth() + 1).toString().padStart(2, '0');
