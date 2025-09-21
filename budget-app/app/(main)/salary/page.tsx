@@ -3,12 +3,12 @@ import { prisma } from '@/lib/db';
 import { SalaryForm } from '@/components/features/salary/salary-form';
 import PayslipList from '@/components/features/salary/payslip-list';
 
-type SalaryPageProps = {
+async function SalaryPage({
+  searchParams,
+}: {
   params: Record<string, never>;
   searchParams: { year?: string; month?: string };
-};
-
-async function SalaryPage({ params, searchParams }: SalaryPageProps) {
+}) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
   const selectedYear = searchParams.year?.toString() ?? currentYear.toString();
@@ -20,18 +20,19 @@ async function SalaryPage({ params, searchParams }: SalaryPageProps) {
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 1);
 
-  const salaries = await prisma.salary.findMany({
-    where: { date: { gte: startDate, lt: endDate } },
-    orderBy: { date: 'desc' },
-  });
-
-  const expenses = await prisma.expense.findMany({
-    where: {
-      date: { gte: startDate, lt: endDate },
-      category: { in: ['Taxes', 'Benefits', 'Retirement', 'Other'] },
-    },
-    orderBy: { date: 'desc' },
-  });
+  const [salaries, expenses] = await Promise.all([
+    prisma.salary.findMany({
+      where: { date: { gte: startDate, lt: endDate } },
+      orderBy: { date: 'desc' },
+    }),
+    prisma.expense.findMany({
+      where: {
+        date: { gte: startDate, lt: endDate },
+        category: { in: ['Taxes', 'Benefits', 'Retirement', 'Other'] },
+      },
+      orderBy: { date: 'desc' },
+    }),
+  ]);
 
   const expensesByDate = expenses.reduce((acc, expense) => {
     const dateKey = expense.date.toISOString().split('T')[0];

@@ -3,12 +3,13 @@ import { format } from 'date-fns';
 import { TrendsChart } from '@/components/features/analysis/trends-chart';
 import { ExpenseCategoryChart } from '@/components/features/analysis/expense-category-chart';
 
-type AnalysisPageProps = {
+async function AnalysisPage({
+  params,
+  searchParams,
+}: {
   params: Record<string, never>;
   searchParams: { month?: string; year?: string };
-};
-
-async function AnalysisPage({ params, searchParams }: AnalysisPageProps) {
+}) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 

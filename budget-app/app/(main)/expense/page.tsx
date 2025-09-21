@@ -38,15 +38,13 @@ const categoryIcons: Record<string, LucideIcon> = {
   Default: Receipt,
 };
 
-type ExpensePageProps = {
-  params: Record<string, never>;
-  searchParams: { month?: string; year?: string };
-};
-
 async function ExpensePage({
   params,
   searchParams,
-}: ExpensePageProps) {
+}: {
+  params: Record<string, never>;
+  searchParams: { month?: string; year?: string };
+}) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
   const selectedYear = searchParams.year ?? currentYear.toString();
