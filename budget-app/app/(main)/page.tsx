@@ -22,7 +22,11 @@ function formatCurrency(amount: number | { toNumber(): number }) {
 type DashboardPageProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: {
+    summaryPage?: string | string[];
+    expensesPage?: string | string[];
+    deductionsPage?: string | string[];
+  };
 };
 
 async function DashboardPage({ searchParams }: DashboardPageProps) {
