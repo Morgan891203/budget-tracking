@@ -23,7 +23,7 @@ const categoryIcons: Record<string, LucideIcon> = {
   'Capital One': CreditCard,
   Bilt: CreditCard,
   Discover: CreditCard,
-  "Mom&apos;s Account": Heart,
+  "Mom's Account": Heart,
   Gasoline: Fuel,
   Venmo: Send,
   Car: Car,
@@ -110,7 +110,7 @@ async function ExpensePage(props: ExpensePageProps) {
   const momAccountNet = iOwe - theyOwe;
   if (momAccountNet !== 0) {
     expensesByCategoryForDisplay.push({
-      category: "Mom&apos;s Account",
+      category: "Mom's Account",
       _sum: { amount: new Prisma.Decimal(momAccountNet) },
     });
     expensesByCategoryForDisplay.sort((a, b) =>
@@ -208,7 +208,7 @@ async function ExpensePage(props: ExpensePageProps) {
             <div className="flex items-center gap-3">
               <Heart className="h-7 w-7 text-pink-500" />
               <h2 className="text-2xl font-semibold text-gray-800">
-                Mom&apos;s Account - {format(startDate, 'MMMM yyyy')}
+                Mom's Account - {format(startDate, 'MMMM yyyy')}
               </h2>
             </div>
             <div className="text-center pt-3">

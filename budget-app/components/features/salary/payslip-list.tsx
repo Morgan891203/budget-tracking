@@ -36,7 +36,10 @@ export default function PayslipList({ payslips }: { payslips: Payslip[] }) {
           <div className="flex justify-between items-center cursor-pointer" onClick={() => toggleExpand(payslip.id)}>
             <div>
               <p className="font-semibold text-lg">{payslip.source}</p>
-              <p className="text-sm text-gray-500">{new Date(payslip.date).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-500">
+                Gross: {formatCurrency(payslip.amount)} | Deductions:{' '}
+                {formatCurrency(payslip.totalDeductions)}
+              </p>
             </div>
             <div className="text-right">
               <p className="font-semibold text-green-600">{formatCurrency(payslip.net)}</p>
