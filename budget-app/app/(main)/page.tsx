@@ -19,13 +19,15 @@ function formatCurrency(amount: number | { toNumber(): number }) {
   }).format(number);
 }
 
+type DashboardPageProps = {
+  params: Record<string, never>;
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
 export default async function DashboardPage({
   params,
   searchParams,
-}: {
-  params: Record<string, never>;
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+}: DashboardPageProps) {
   const ITEMS_PER_PAGE = 5;
   const summaryPage = parseInt((searchParams.summaryPage as string) ?? '1', 10);
   const expensesPage = parseInt((searchParams.expensesPage as string) ?? '1', 10);

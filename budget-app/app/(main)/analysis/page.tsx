@@ -3,12 +3,12 @@ import { format } from 'date-fns';
 import { TrendsChart } from '@/components/features/analysis/trends-chart';
 import { ExpenseCategoryChart } from '@/components/features/analysis/expense-category-chart';
 
-export default async function AnalysisPage({
-  searchParams,
-}: {
-  params: Record<string, never>; // This page doesn't have dynamic route parameters
+type AnalysisPageProps = {
+  params: Record<string, never>;
   searchParams: { month?: string; year?: string };
-}) {
+};
+
+export default async function AnalysisPage({ params, searchParams }: AnalysisPageProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 

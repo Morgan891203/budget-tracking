@@ -3,13 +3,12 @@ import { prisma } from '@/lib/db';
 import { SalaryForm } from '@/components/features/salary/salary-form';
 import PayslipList from '@/components/features/salary/payslip-list';
 
-async function SalaryPage({
-  params,
-  searchParams,
-}: {
+type SalaryPageProps = {
   params: Record<string, never>;
   searchParams: { year?: string; month?: string };
-}) {
+};
+
+async function SalaryPage({ params, searchParams }: SalaryPageProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
   const selectedYear = searchParams.year?.toString() ?? currentYear.toString();
