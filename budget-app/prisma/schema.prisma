@@ -6,7 +6,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("PRISMA_DATABASE_URL") // Used by Prisma Client for the running application
+  directUrl = env("POSTGRES_URL")    // Used by Prisma Migrate for deployments
 }
 
 model Salary {
@@ -38,4 +39,3 @@ model Debt {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
-
