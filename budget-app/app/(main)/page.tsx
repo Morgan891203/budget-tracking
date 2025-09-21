@@ -22,14 +22,11 @@ function formatCurrency(amount: number | { toNumber(): number }) {
 type DashboardPageProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: {
-    summaryPage?: string | string[];
-    expensesPage?: string | string[];
-    deductionsPage?: string | string[];
-  };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
-async function DashboardPage({ searchParams }: DashboardPageProps) {
+async function DashboardPage(props: DashboardPageProps) {
+  const { searchParams } = props;
   const ITEMS_PER_PAGE = 5;
   const summaryPageParam = searchParams.summaryPage;
   const summaryPage = parseInt(

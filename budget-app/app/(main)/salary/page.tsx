@@ -6,10 +6,11 @@ import PayslipList from '@/components/features/salary/payslip-list';
 type SalaryPageProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: { year?: string | string[]; month?: string | string[] };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
-async function SalaryPage({ searchParams }: SalaryPageProps) {
+async function SalaryPage(props: SalaryPageProps) {
+  const { searchParams } = props;
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
   const yearParam = searchParams.year;

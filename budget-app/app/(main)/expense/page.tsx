@@ -41,10 +41,11 @@ const categoryIcons: Record<string, LucideIcon> = {
 type ExpensePageProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: { month?: string | string[]; year?: string | string[] };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
-async function ExpensePage({ searchParams }: ExpensePageProps) {
+async function ExpensePage(props: ExpensePageProps) {
+  const { searchParams } = props;
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
   const yearParam = searchParams.year;

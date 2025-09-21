@@ -6,10 +6,11 @@ import { ExpenseCategoryChart } from '@/components/features/analysis/expense-cat
 type AnalysisPageProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
-  searchParams: { month?: string | string[]; year?: string | string[] };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
-async function AnalysisPage({ searchParams }: AnalysisPageProps) {
+async function AnalysisPage(props: AnalysisPageProps) {
+  const { searchParams } = props;
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
