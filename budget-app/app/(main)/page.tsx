@@ -1,8 +1,11 @@
 import {
+  CreditCard,
+  FileMinus,
   Heart,
   PiggyBank,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 import { prisma } from '@/lib/db';
 import { formatCurrency } from '@/lib/utils';
@@ -133,13 +136,14 @@ async function DashboardPage(props: DashboardPageProps) {
       const expenseData = monthlyExpenseSummary[monthKey] || { total: 0 };
       const momDebtData = monthlyMomDebtSummary[monthKey] || { balance: 0 };
       const netIncome = incomeData.gross - incomeData.deductions;
+      const totalExpenses = expenseData.total - momDebtData.balance;
       return {
         date: new Date(parseInt(year), parseInt(month) - 1, 1),
         gross: incomeData.gross,
         deductions: incomeData.deductions,
         net: netIncome,
-        totalExpenses: expenseData.total,
-        netBalance: netIncome - expenseData.total + momDebtData.balance,
+        totalExpenses: totalExpenses,
+        netBalance: netIncome - totalExpenses,
         momDebtBalance: momDebtData.balance,
       };
     })
@@ -156,12 +160,16 @@ async function DashboardPage(props: DashboardPageProps) {
     summaryPage * ITEMS_PER_PAGE
   );
 
-  const expenseSummaryList = Object.entries(monthlyExpenseSummary)
-    .map(([monthKey, summary]) => {
+  const expenseSummaryList = allMonthKeys
+    .map((monthKey) => {
       const [year, month] = monthKey.split('-');
+      const expenseData = monthlyExpenseSummary[monthKey] || { total: 0 };
+      const momDebtData = monthlyMomDebtSummary[monthKey] || { balance: 0 };
+      // Total expenses = other expenses + (what I owe mom) - (what she owes me)
+      const total = expenseData.total - momDebtData.balance;
       return {
         date: new Date(parseInt(year), parseInt(month) - 1, 1),
-        ...summary,
+        total,
       };
     })
     .sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -304,7 +312,98 @@ async function DashboardPage(props: DashboardPageProps) {
               </ul>
             </div>
           </div>
-          {/* Other cards will go here */}
+          <div className="bg-white rounded-lg shadow-md">
+            <div className="flex items-center gap-4 p-6 border-b border-gray-200">
+              <CreditCard className="h-8 w-8 text-red-500" />
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Total Expenses Summary
+              </h2>
+            </div>
+            <ul className="divide-y divide-gray-200">
+              {paginatedExpenseSummaryList.length === 0 ? (
+                <li className="p-6 text-center text-gray-500">
+                  No expense data found. Add an expense to get started.
+                </li>
+              ) : (
+                paginatedExpenseSummaryList.map((summary) => (
+                  <li key={summary.date.toISOString()}>
+                    <Link
+                      href={`/expense?year=${format(
+                        summary.date,
+                        'yyyy',
+                      )}&month=${format(summary.date, 'MM')}`}
+                      className="p-6 flex justify-between items-center hover:bg-gray-50 transition-colors"
+                    >
+                      <p className="font-semibold text-gray-800 text-lg">
+                        {format(summary.date, 'MMMM yyyy')}
+                      </p>
+                      <p className="font-semibold text-red-600 text-xl">
+                        {formatCurrency(summary.total)}
+                      </p>
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
+            <Pagination
+              currentPage={expensesPage}
+              totalPages={totalExpenseSummaryPages}
+              paramName="expensesPage"
+              searchParams={searchParams}
+            />
+          </div>
+          <div className="bg-white rounded-lg shadow-md">
+            <div className="flex items-center gap-4 p-6 border-b border-gray-200">
+              <FileMinus className="h-8 w-8 text-orange-500" />
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Deductions Summary
+              </h2>
+            </div>
+            <ul className="divide-y divide-gray-200">
+              {paginatedDeductionDetailsList.length === 0 ? (
+                <li className="p-6 text-center text-gray-500">
+                  No deduction data found.
+                </li>
+              ) : (
+                paginatedDeductionDetailsList.map((summary) => (
+                  <li key={summary.date.toISOString()}>
+                    <Link
+                      href={`/salary?year=${format(
+                        summary.date,
+                        'yyyy',
+                      )}&month=${format(summary.date, 'MM')}`}
+                      className="block p-6 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex justify-between items-center">
+                        <p className="font-semibold text-gray-800 text-lg">
+                          {format(summary.date, 'MMMM yyyy')}
+                        </p>
+                        <p className="font-semibold text-orange-600 text-xl">
+                          {formatCurrency(summary.total)}
+                        </p>
+                      </div>
+                      <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                        {Object.entries(summary.breakdown).map(
+                          ([category, amount]) => (
+                            <li key={category} className="flex justify-between">
+                              <span>{category}</span>
+                              <span>{formatCurrency(amount)}</span>
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
+            <Pagination
+              currentPage={deductionsPage}
+              totalPages={totalDeductionPages}
+              paramName="deductionsPage"
+              searchParams={searchParams}
+            />
+          </div>
         </div>
       </div>
     </div>
