@@ -39,8 +39,10 @@ const categoryIcons: Record<string, LucideIcon> = {
 };
 
 export default async function ExpensePage({
+  params,
   searchParams,
 }: {
+  params: Record<string, never>;
   searchParams: { month?: string; year?: string };
 }) {
   const currentYear = new Date().getFullYear();

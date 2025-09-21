@@ -4,9 +4,11 @@ import { SalaryForm } from '@/components/features/salary/salary-form';
 import PayslipList from '@/components/features/salary/payslip-list';
 
 async function SalaryPage({
+  params,
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Record<string, never>;
+  searchParams: { year?: string; month?: string };
 }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);

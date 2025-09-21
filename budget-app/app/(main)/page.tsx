@@ -20,8 +20,10 @@ function formatCurrency(amount: number | { toNumber(): number }) {
 }
 
 export default async function DashboardPage({
+  params,
   searchParams,
 }: {
+  params: Record<string, never>;
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const ITEMS_PER_PAGE = 5;

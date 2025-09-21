@@ -6,7 +6,7 @@ import { ExpenseCategoryChart } from '@/components/features/analysis/expense-cat
 export default async function AnalysisPage({
   searchParams,
 }: {
-  params: {}; // This page doesn't have dynamic route parameters
+  params: Record<string, never>; // This page doesn't have dynamic route parameters
   searchParams: { month?: string; year?: string };
 }) {
   const currentYear = new Date().getFullYear();
