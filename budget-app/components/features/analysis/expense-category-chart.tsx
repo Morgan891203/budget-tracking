@@ -22,6 +22,7 @@ const COLORS = [
 ];
 
 const RADIAN = Math.PI / 180;
+
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
   // Don't render labels for small slices to avoid clutter
   if (percent < 0.05) {

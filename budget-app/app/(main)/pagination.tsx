@@ -16,7 +16,16 @@ export function Pagination({ currentPage, totalPages, paramName, searchParams }:
   const pathname = usePathname();
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams as any);
+    const entries = Object.entries(searchParams).flatMap(([key, value]) => {
+      if (value === undefined) {
+        return [];
+      }
+      if (Array.isArray(value)) {
+        return value.map((v) => [key, v]);
+      }
+      return [[key, value]];
+    });
+    const params = new URLSearchParams(entries);
     params.set(paramName, page.toString());
     router.push(`${pathname}?${params.toString()}`);
   };

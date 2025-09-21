@@ -4,7 +4,7 @@ import { deleteExpense, deleteMomDebtTransaction } from '@/lib/actions';
 import { MomDebtForm } from '@/components/features/expense/mom-debt-form';
 import { EditExpense } from '@/components/features/expense/edit-expense';
 import { DeleteButton } from '@/components/features/expense/delete-button';
-import { Prisma, type Expense, type Debt } from '@prisma/client';
+import { Prisma, type Expense } from '@prisma/client';
 import { format } from 'date-fns';
 import {
   Home,

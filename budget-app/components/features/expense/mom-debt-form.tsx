@@ -44,7 +44,7 @@ export function MomDebtForm({ selectedMonth, selectedYear }: MomDebtFormProps) {
       <div className="flex items-center gap-3">
         <Heart className="h-7 w-7 text-pink-500" />
         <h2 className="text-2xl font-semibold text-gray-800">
-          Add Mom's Transaction
+          Add Mom&apos;s Transaction
         </h2>
       </div>
 

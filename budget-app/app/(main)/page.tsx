@@ -1,6 +1,4 @@
 import {
-  CreditCard,
-  FileMinus,
   Heart,
   PiggyBank,
 } from 'lucide-react';
