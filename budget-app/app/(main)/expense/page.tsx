@@ -208,7 +208,7 @@ async function ExpensePage(props: ExpensePageProps) {
             <div className="flex items-center gap-3">
               <Heart className="h-7 w-7 text-pink-500" />
               <h2 className="text-2xl font-semibold text-gray-800">
-                Mom's Account - {format(startDate, 'MMMM yyyy')}
+                Mom&apos;s Account - {format(startDate, 'MMMM yyyy')}
               </h2>
             </div>
             <div className="text-center pt-3">
