@@ -1,29 +1,17 @@
+import { format } from 'date-fns';
 import { prisma } from '@/lib/db';
 import { SalaryForm } from '@/components/features/salary/salary-form';
-import PayslipList, { type PayslipData } from '@/components/features/salary/payslip-list';
-import { format } from 'date-fns';
-import { Prisma, type Expense, type Salary } from '@prisma/client';
+import PayslipList from '@/components/features/salary/payslip-list';
 
-// Helper function to format currency
-function formatCurrency(amount: number | Prisma.Decimal) {
-  const number = typeof amount === 'number' ? amount : amount.toNumber();
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(number);
-}
-
-export default async function SalaryPage({
+async function SalaryPage({
   searchParams,
 }: {
-  searchParams: { month?: string; year?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
-
-  const selectedYear = searchParams.year ?? currentYear.toString();
-  const selectedMonth =
-    searchParams.month ?? (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const selectedYear = searchParams.year?.toString() ?? currentYear.toString();
+  const selectedMonth = searchParams.month?.toString() ?? (new Date().getMonth() + 1).toString().padStart(2, '0');
 
   const year = parseInt(selectedYear, 10);
   const month = parseInt(selectedMonth, 10);
@@ -31,31 +19,17 @@ export default async function SalaryPage({
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 1);
 
-  const salaries: Salary[] = await prisma.salary.findMany({
-    where: {
-      date: {
-        gte: startDate,
-        lt: endDate,
-      },
-    },
-    orderBy: {
-      date: 'desc',
-    },
+  const salaries = await prisma.salary.findMany({
+    where: { date: { gte: startDate, lt: endDate } },
+    orderBy: { date: 'desc' },
   });
 
-  const expenses: Expense[] = await prisma.expense.findMany({
+  const expenses = await prisma.expense.findMany({
     where: {
-      date: {
-        gte: startDate,
-        lt: endDate,
-      },
-      category: {
-        in: ['Taxes', 'Benefits', 'Retirement', 'Other'],
-      },
+      date: { gte: startDate, lt: endDate },
+      category: { in: ['Taxes', 'Benefits', 'Retirement', 'Other'] },
     },
-    orderBy: {
-      date: 'desc',
-    },
+    orderBy: { date: 'desc' },
   });
 
   const expensesByDate = expenses.reduce((acc, expense) => {
@@ -65,15 +39,12 @@ export default async function SalaryPage({
     }
     acc[dateKey].push(expense);
     return acc;
-  }, {} as Record<string, Expense[]>);
+  }, {} as Record<string, typeof expenses>);
 
-  const payslips: PayslipData[] = salaries.map((salary) => {
+  const payslips = salaries.map((salary) => {
     const dateKey = salary.date.toISOString().split('T')[0];
     const deductions = expensesByDate[dateKey] || [];
-    const totalDeductions = deductions.reduce(
-      (sum, exp) => sum + exp.amount.toNumber(),
-      0
-    );
+    const totalDeductions = deductions.reduce((sum, exp) => sum + exp.amount.toNumber(), 0);
     const netPay = salary.amount.toNumber() - totalDeductions;
 
     return {
@@ -94,19 +65,8 @@ export default async function SalaryPage({
         <div className="bg-white p-4 rounded-lg shadow-md">
           <form method="get" className="flex items-end gap-4">
             <div>
-              <label
-                htmlFor="month"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Month
-              </label>
-              <select
-                id="month"
-                name="month"
-                required
-                defaultValue={selectedMonth}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
+              <label htmlFor="month" className="block text-sm font-medium text-gray-700">Month</label>
+              <select id="month" name="month" required defaultValue={selectedMonth} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 <option value="01">January</option>
                 <option value="02">February</option>
                 <option value="03">March</option>
@@ -122,23 +82,10 @@ export default async function SalaryPage({
               </select>
             </div>
             <div>
-              <label
-                htmlFor="year"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Year
-              </label>
-              <select
-                id="year"
-                name="year"
-                required
-                defaultValue={selectedYear}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
+              <label htmlFor="year" className="block text-sm font-medium text-gray-700">Year</label>
+              <select id="year" name="year" required defaultValue={selectedYear} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                 {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
+                  <option key={y} value={y}>{y}</option>
                 ))}
               </select>
             </div>
@@ -157,3 +104,5 @@ export default async function SalaryPage({
     </div>
   );
 }
+
+export default SalaryPage;
