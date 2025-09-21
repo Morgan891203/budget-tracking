@@ -1,14 +1,11 @@
 import { prisma } from '@/lib/db';
 import { format } from 'date-fns';
-import type { Expense, Debt } from '@prisma/client';
 import { TrendsChart } from '@/components/features/analysis/trends-chart';
 import { ExpenseCategoryChart } from '@/components/features/analysis/expense-category-chart';
 
 export default async function AnalysisPage({
   searchParams,
-}: {
-  searchParams: { month?: string; year?: string };
-}) {
+}: { searchParams: { month?: string; year?: string } }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
@@ -28,45 +25,45 @@ export default async function AnalysisPage({
   const monthStartDate = new Date(year, month - 1, 1);
   const nextMonthStartDate = new Date(year, month, 1);
 
-  // --- Data for Yearly Trends Chart ---
-  const yearlySalaries = await prisma.salary.findMany({
-    where: {
-      date: {
-        gte: yearStartDate,
-        lt: nextYearStartDate,
-      },
-    },
-    orderBy: {
-      date: 'asc',
-    },
-  });
-
-  const yearlyExpenses: Expense[] = await prisma.expense.findMany({
-    where: {
-      date: {
-        gte: yearStartDate,
-        lt: nextYearStartDate,
-      },
-    },
-    orderBy: {
-      date: 'asc',
-    },
-  });
-
-  const yearlyMomDebts: Debt[] = await prisma.debt.findMany({
-    where: {
-      person: 'Mom',
-      date: {
-        gte: yearStartDate,
-        lt: nextYearStartDate,
-      },
-    },
-    orderBy: {
-      date: 'asc',
-    },
-  });
-
   const deductionCategories = ['Taxes', 'Benefits', 'Retirement', 'Other'];
+
+  // --- Run all data queries in parallel for better performance ---
+  const [
+    yearlySalaries,
+    yearlyExpenses,
+    yearlyMomDebts,
+    monthlyExpenses,
+    monthlyMomDebts,
+  ] = await Promise.all([
+    prisma.salary.findMany({
+      where: { date: { gte: yearStartDate, lt: nextYearStartDate } },
+      orderBy: { date: 'asc' },
+    }),
+    prisma.expense.findMany({
+      where: { date: { gte: yearStartDate, lt: nextYearStartDate } },
+      orderBy: { date: 'asc' },
+    }),
+    prisma.debt.findMany({
+      where: {
+        person: 'Mom',
+        date: { gte: yearStartDate, lt: nextYearStartDate },
+      },
+      orderBy: { date: 'asc' },
+    }),
+    prisma.expense.findMany({
+      where: {
+        date: { gte: monthStartDate, lt: nextMonthStartDate },
+        NOT: { category: { in: [...deductionCategories, 'Gasoline'] } },
+      },
+    }),
+    prisma.debt.findMany({
+      where: {
+        person: 'Mom',
+        date: { gte: monthStartDate, lt: nextMonthStartDate },
+      },
+    }),
+  ]);
+
   const yearlyDeductions = yearlyExpenses.filter((exp) =>
     deductionCategories.includes(exp.category)
   );
@@ -135,31 +132,6 @@ export default async function AnalysisPage({
       Expenses: item.Expenses,
       'Net Balance': item['Net Balance'],
     }));
-
-  // --- Data for Monthly Expense Pie Chart ---
-  const monthlyExpenses: Expense[] = await prisma.expense.findMany({
-    where: {
-      date: {
-        gte: monthStartDate,
-        lt: nextMonthStartDate,
-      },
-      NOT: {
-        category: {
-          in: [...deductionCategories, 'Gasoline'],
-        },
-      },
-    },
-  });
-
-  const monthlyMomDebts: Debt[] = await prisma.debt.findMany({
-    where: {
-      person: 'Mom',
-      date: {
-        gte: monthStartDate,
-        lt: nextMonthStartDate,
-      },
-    },
-  });
 
   const momAccountNet = monthlyMomDebts.reduce((acc, debt) => {
     const amount = debt.amount.toNumber();
