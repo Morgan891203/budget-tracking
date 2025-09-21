@@ -3,7 +3,6 @@ import {
   PiggyBank,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import Link from 'next/link';
 
 import { prisma } from '@/lib/db';
 import { deleteMomDebtTransaction } from '@/lib/actions';
